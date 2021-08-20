@@ -1,0 +1,46 @@
+<html>
+
+<!--This is HTML, the stuff that appears on the page-->
+
+<label for="hs">Headphone Sensitivity in dB/V</label>
+<input type="number" id="headphonesens" name="hs" onchange="update()"><br>
+<label for="snr">Amplifier Signal to Noise Ratio</label>
+<input type="number" id="amplifiersnr" name="snr" onchange="update()"><br>
+<label for="rf">Reference Level / Vrms</label>
+<input type="number" id="referencelvl" name="rf" onchange="update()"><br>
+
+<p id="output"></div>
+
+</html>
+
+
+
+<script>
+
+//This is JavaScript, the logic for the page 
+
+//Function is called everytime an input field is updated
+
+function update(){
+
+//Variables return the value of the DOM objects I've specified, which I can now reference in the logic
+
+var headphoneSensitivity = document.getElementById("headphonesens").value;
+var amplifierSnr = document.getElementById("amplifiersnr").value;
+var referenceLevel = document.getElementById("referencelvl").value;
+var output = document.getElementById("output");
+
+//Here's the logic
+  
+var logOfReferenceLevel = Math.log10(referenceLevel) * 20;
+var ampSnrMinusResult = (amplifierSnr - logOfReferenceLevel);
+var noiseOutput = (headphoneSensitivity - ampSnrMinusResult);
+var noiseOutputRounded = noiseOutput.toFixed(2);
+  
+//Here's how we write the answer to the page
+output.innerHTML = "Total noise output = " + noiseOutputRounded + "dB";
+
+}
+
+</script>
+
