@@ -2,24 +2,14 @@
 
 <!--This is HTML, markup telling the browser what to display on a client's browser-->
 
-
-<!--Sensitivity Calculator inputs-->
-
-<h3>Headphone Sensitivity Calculator</h3>
-<p>Input your headphone's impedance and its sensitivity in milliwatts or volts.</p>
+<h3>Audible Noise Calculator</h3>
+<p>Input your headphone's sensitivity (either dB/mW or dB/v), impedance, and your amplifier's SnR and Reference level.</p>
 <label for="ohm">Impedance</label>
 <input type="number" id="impedance" name="ohm" onchange="sensCalc()"><br>
 <label for="mw">Sensitivity as dB/mW</label>
 <input type="number" id="milliwattsens" name="mw" onchange="sensCalc()"><br>
 <label for="vrms">Sensitity in dB/V</label>
-<input type="number" id="vrmssens" name="vrms" onchange="sensCalc()"><br><br>
-
-<!--SNR Calculator inputs and output-->
-
-<h3>Signal to Noise Ratio Calculator</h3>
-<p>Input your amplifier's SNR ratio, reference level, and your headphone's sensitivity.</p>
-<label for="hs">Headphone Sensitivity in dB/V</label>
-<input type="number" id="headphonesens" name="hs" onchange="SnrCalc()"><br>
+<input type="number" id="vrmssens" name="vrms" onchange="sensCalc()"><br>
 <label for="snr">Amplifier Signal to Noise Ratio</label>
 <input type="number" id="amplifiersnr" name="snr" onchange="SnrCalc()"><br>
 <label for="rf">Reference Level / Vrms</label>
@@ -37,9 +27,6 @@
 //Here we the logic to the relevant information for easy reference, and as the objects 
 //we're reading from are static and don't change, we should define them as constants
 
-const headphoneSensitivity = document.getElementById("headphonesens").value;
-const amplifierSnr = document.getElementById("amplifiersnr").value;
-const referenceLevel = document.getElementById("referencelvl").value;
 const impedance = document.getElementById("impedance").value;
 const output = document.getElementById("output");
 
@@ -51,6 +38,9 @@ function SnrCalc(){
 
   //By telling the code how to get do each stage of the calculation we can just call the result and
   //the code will figure it out for us
+  var headphoneSensitivity = document.getElementById("vrmssens").value;
+  var amplifierSnr = document.getElementById("amplifiersnr").value;
+  var referenceLevel = document.getElementById("referencelvl").value;
   var logOfReferenceLevel = Math.log10(referenceLevel) * 20;
   var ampSnrMinusResult = (amplifierSnr - logOfReferenceLevel);
   var noiseOutput = (headphoneSensitivity - ampSnrMinusResult);
@@ -59,6 +49,7 @@ function SnrCalc(){
   //Here's how we write the answer to the page - the code will calculate the correct value with
   //the formula we gave it above
   output.innerHTML = "Total noise output = " + noiseOutputRounded + "dB";
+  console.log(amplifierSnr + referenceLevel);
 }
 
 function sensCalc() {
@@ -82,10 +73,10 @@ function sensCalc() {
    if (impedance.length > 0 && milliwattSensitivity.length > 0 && voltageSensitivity.length > 0) { 
     console.log("all fields populated! no calculation required");
    } else if (impedance.length > 0 && milliwattSensitivity.length > 0) {
-    console.log("everything but mW sensitivity filled, calculating mW/dB...");
+    console.log("everything but Vrms sensitivity filled, calculating V/dB...");
     calculateVoltageSensitivity();
    } else if (impedance.length > 0 && voltageSensitivity.length > 0) {
-    console.log("everything but Vrms sensitivity filled, calculating V/dB...");
+    console.log("everything but mW sensitivity filled, calculating Mw/dB...");
     calculateMilliwattSensitivity();
    } else {
      console.log("insufficient data for calculation, waiting for input..");
