@@ -49,16 +49,16 @@ const output = document.getElementById("output");
 
 function SnrCalc(){
 
-//By telling the code how to get do each stage of the calculation we can just call the result and
-//the code will figure it out for us
-var logOfReferenceLevel = Math.log10(referenceLevel) * 20;
-var ampSnrMinusResult = (amplifierSnr - logOfReferenceLevel);
-var noiseOutput = (headphoneSensitivity - ampSnrMinusResult);
-var noiseOutputRounded = noiseOutput.toFixed(2);
-  
-//Here's how we write the answer to the page - the code will calculate the correct value with
-//the formula we gave it above
-output.innerHTML = "Total noise output = " + noiseOutputRounded + "dB";
+  //By telling the code how to get do each stage of the calculation we can just call the result and
+  //the code will figure it out for us
+  var logOfReferenceLevel = Math.log10(referenceLevel) * 20;
+  var ampSnrMinusResult = (amplifierSnr - logOfReferenceLevel);
+  var noiseOutput = (headphoneSensitivity - ampSnrMinusResult);
+  var noiseOutputRounded = noiseOutput.toFixed(2);
+    
+  //Here's how we write the answer to the page - the code will calculate the correct value with
+  //the formula we gave it above
+  output.innerHTML = "Total noise output = " + noiseOutputRounded + "dB";
 }
 
 function sensCalc() {
