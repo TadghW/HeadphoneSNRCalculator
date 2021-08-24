@@ -105,10 +105,12 @@ function sensCalc() {
     
     var calculatedVoltageSensitivity = milliwattSensitivity - (Math.log10(Math.sqrt(impedance * 0.001)) * 20);
     var roundedVoltageSensitivity = calculatedVoltageSensitivity.toFixed(2);
+
   //For some reason assigning the new value directly to the voltageSensitivity variable wasn't working,
   //solved by selecting the input field with querySelector instead of id, here's one of the reasons 
   //here's one of the scenarios where assigning a name as well as an id makes sense :) although I 
   //honestly can't think of others...
+    
     document.querySelector('input[name="vrms"]').value = roundedVoltageSensitivity;
     return roundedVoltageSensitivity;
   }
