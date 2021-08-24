@@ -121,9 +121,9 @@ function calculateMilliwattSensitivity() {
   var impedance = document.getElementById("impedance").value;
   var milliwattSensitivity = document.getElementById("milliwattsens").value;
   var voltageSensitivity = document.getElementById("vrmssens").value;
-  var calculatedMilliwattSensitivity = (voltageSensitivity -((1 / impedance / 0.001)) + 1);
+  var calculatedMilliwattSensitivity = (voltageSensitivity -(10 * Math.log10((1/impedance)*1000)));
   var roundedMilliwattSensitivity = calculatedMilliwattSensitivity.toFixed(2);
-  
+
   document.querySelector('input[name="mw"]').value = roundedMilliwattSensitivity;
   return roundedMilliwattSensitivity;
 }
