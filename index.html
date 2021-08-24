@@ -93,18 +93,18 @@ function sensCalc() {
 
    }
 
-   function calculateVoltageSensitivity() {
+function calculateVoltageSensitivity() {
     
   //Variables in front define relevant information to the calculation
   //Calculation is made with existing information and rounded to two places, before being ouput
   //Output populates the appropriate input field
 
-    var impedance = document.getElementById("impedance").value;
-    var milliwattSensitivity = document.getElementById("milliwattsens").value;
-    var voltageSensitivity = document.getElementById("vrmssens").value;
-    
-    var calculatedVoltageSensitivity = milliwattSensitivity - (Math.log10(Math.sqrt(impedance * 0.001)) * 20);
-    var roundedVoltageSensitivity = calculatedVoltageSensitivity.toFixed(2);
+  var impedance = document.getElementById("impedance").value;
+  var milliwattSensitivity = document.getElementById("milliwattsens").value;
+  var voltageSensitivity = document.getElementById("vrmssens").value;
+  
+  var calculatedVoltageSensitivity = milliwattSensitivity - (Math.log10(Math.sqrt(impedance * 0.001)) * 20);
+  var roundedVoltageSensitivity = calculatedVoltageSensitivity.toFixed(2);
 
   //For some reason assigning the new value directly to the voltageSensitivity variable wasn't working,
   //solved by selecting the input field with querySelector instead of id, here's one of the reasons 
@@ -113,19 +113,20 @@ function sensCalc() {
     
     document.querySelector('input[name="vrms"]').value = roundedVoltageSensitivity;
     return roundedVoltageSensitivity;
-  }
+}
 
-  function calculateMilliwattSensitivity() {
+function calculateMilliwattSensitivity() {
 
-  //Same shtick here
-    var impedance = document.getElementById("impedance").value;
-    var milliwattSensitivity = document.getElementById("milliwattsens").value;
-    var voltageSensitivity = document.getElementById("vrmssens").value;
-    var calculatedMilliwattSensitivity = (voltageSensitivity -((1 / impedance / 0.001)) + 1);
-    var roundedMilliwattSensitivity = calculatedMilliwattSensitivity.toFixed(2);
-    document.querySelector('input[name="mw"]').value = roundedMilliwattSensitivity;
-    return roundedMilliwattSensitivity;
-  }
+ //Same shtick here
+ var impedance = document.getElementById("impedance").value;
+ var milliwattSensitivity = document.getElementById("milliwattsens").value;
+ var voltageSensitivity = document.getElementById("vrmssens").value;
+ var calculatedMilliwattSensitivity = (voltageSensitivity -((1 / impedance / 0.001)) + 1);
+ var roundedMilliwattSensitivity = calculatedMilliwattSensitivity.toFixed(2);
+ 
+ document.querySelector('input[name="mw"]').value = roundedMilliwattSensitivity;
+ return roundedMilliwattSensitivity;
+}
 
 </script>
 
