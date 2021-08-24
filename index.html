@@ -1,46 +1,129 @@
 <html>
 
-<!--This is HTML, the stuff that appears on the page-->
+<!--This is HTML, markup telling the browser what to display on a client's browser-->
 
+
+<!--Sensitivity Calculator inputs-->
+
+<h3>Headphone Sensitivity Calculator</h3>
+<p>Input your headphone's impedance and its sensitivity in milliwatts or volts.</p>
+<label for="ohm">Impedance</label>
+<input type="number" id="impedance" name="ohm" onchange="sensCalc()"><br>
+<label for="mw">Sensitivity as dB/mW</label>
+<input type="number" id="milliwattsens" name="mw" onchange="sensCalc()"><br>
+<label for="vrms">Sensitity in dB/V</label>
+<input type="number" id="vrmssens" name="vrms" onchange="sensCalc()"><br><br>
+
+<!--SNR Calculator inputs and output-->
+
+<h3>Signal to Noise Ratio Calculator</h3>
+<p>Input your amplifier's SNR ratio, reference level, and your headphone's sensitivity.</p>
 <label for="hs">Headphone Sensitivity in dB/V</label>
-<input type="number" id="headphonesens" name="hs" onchange="update()"><br>
+<input type="number" id="headphonesens" name="hs" onchange="SnrCalc()"><br>
 <label for="snr">Amplifier Signal to Noise Ratio</label>
-<input type="number" id="amplifiersnr" name="snr" onchange="update()"><br>
+<input type="number" id="amplifiersnr" name="snr" onchange="SnrCalc()"><br>
 <label for="rf">Reference Level / Vrms</label>
-<input type="number" id="referencelvl" name="rf" onchange="update()"><br>
+<input type="number" id="referencelvl" name="rf" onchange="SnrCalc()"><br>
 
 <p id="output"></div>
 
 </html>
 
 
-
 <script>
 
 //This is JavaScript, the logic for the page 
 
-//Function is called everytime an input field is updated
+//Here we the logic to the relevant information for easy reference, and as the objects 
+//we're reading from are static and don't change, we should define them as constants
 
-function update(){
+const headphoneSensitivity = document.getElementById("headphonesens").value;
+const amplifierSnr = document.getElementById("amplifiersnr").value;
+const referenceLevel = document.getElementById("referencelvl").value;
+const impedance = document.getElementById("impedance").value;
+const output = document.getElementById("output");
 
-//Variables return the value of the DOM objects I've specified, which I can now reference in the logic
+//A "function" is a package of behaviour we want this program to undertake when told to
+//In this instance you can see we're calling SnrCalc() whenever the input fields for the 
+//SNR calculator are changed.
 
-var headphoneSensitivity = document.getElementById("headphonesens").value;
-var amplifierSnr = document.getElementById("amplifiersnr").value;
-var referenceLevel = document.getElementById("referencelvl").value;
-var output = document.getElementById("output");
+function SnrCalc(){
 
-//Here's the logic
-  
+//By telling the code how to get do each stage of the calculation we can just call the result and
+//the code will figure it out for us
 var logOfReferenceLevel = Math.log10(referenceLevel) * 20;
 var ampSnrMinusResult = (amplifierSnr - logOfReferenceLevel);
 var noiseOutput = (headphoneSensitivity - ampSnrMinusResult);
 var noiseOutputRounded = noiseOutput.toFixed(2);
   
-//Here's how we write the answer to the page
+//Here's how we write the answer to the page - the code will calculate the correct value with
+//the formula we gave it above
 output.innerHTML = "Total noise output = " + noiseOutputRounded + "dB";
-
 }
+
+function sensCalc() {
+
+  //Secondary calculator (headphone sensitivity and impedance calc)
+  
+  //As each 2/3 of our functions for the Sensitivity Calculator actually output stuff to the inputs
+  //the value of said inputs is no longer constant, so we need to use locally scoped variables that
+  //we can change as we see fit
+
+  var impedance = document.getElementById("impedance").value;
+  var milliwattSensitivity = document.getElementById("milliwattsens").value;
+  var voltageSensitivity = document.getElementById("vrmssens").value;
+
+  //This part chooses which calculation to do based on what the user has input:
+  //If all three fields are populated do nothing
+  //If everything but dB/V is populated calculate dB/V
+  //If everything but dB/mW is populated calculate dB/mW
+  //If only one field is populated do nothing
+
+   if (impedance.length > 0 && milliwattSensitivity.length > 0 && voltageSensitivity.length > 0) { 
+    console.log("all fields populated! no calculation required");
+   } else if (impedance.length > 0 && milliwattSensitivity.length > 0) {
+    console.log("everything but mW sensitivity filled, calculating mW/dB...");
+    calculateVoltageSensitivity();
+   } else if (impedance.length > 0 && voltageSensitivity.length > 0) {
+    console.log("everything but Vrms sensitivity filled, calculating V/dB...");
+    calculateMilliwattSensitivity();
+   } else {
+     console.log("insufficient data for calculation, waiting for input..");
+    }
+
+   }
+
+   function calculateVoltageSensitivity() {
+    
+  //Variables in front define relevant information to the calculation
+  //Calculation is made with existing information and rounded to two places, before being ouput
+  //Output populates the appropriate input field
+
+    var impedance = document.getElementById("impedance").value;
+    var milliwattSensitivity = document.getElementById("milliwattsens").value;
+    var voltageSensitivity = document.getElementById("vrmssens").value;
+    
+    var calculatedVoltageSensitivity = milliwattSensitivity - (Math.log10(Math.sqrt(impedance * 0.001)) * 20);
+    var roundedVoltageSensitivity = calculatedVoltageSensitivity.toFixed(2);
+  //For some reason assigning the new value directly to the voltageSensitivity variable wasn't working,
+  //solved by selecting the input field with querySelector instead of id, here's one of the reasons 
+  //here's one of the scenarios where assigning a name as well as an id makes sense :) although I 
+  //honestly can't think of others...
+    document.querySelector('input[name="vrms"]').value = roundedVoltageSensitivity;
+    return roundedVoltageSensitivity;
+  }
+
+  function calculateMilliwattSensitivity() {
+
+  //Same shtick here
+    var impedance = document.getElementById("impedance").value;
+    var milliwattSensitivity = document.getElementById("milliwattsens").value;
+    var voltageSensitivity = document.getElementById("vrmssens").value;
+    var calculatedMilliwattSensitivity = (voltageSensitivity -((1 / impedance / 0.001)) + 1);
+    var roundedMilliwattSensitivity = calculatedMilliwattSensitivity.toFixed(2);
+    document.querySelector('input[name="mw"]').value = roundedMilliwattSensitivity;
+    return roundedMilliwattSensitivity;
+  }
 
 </script>
 
