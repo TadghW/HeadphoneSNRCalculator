@@ -5,31 +5,31 @@
 <h3>Audible Noise Calculator</h3>
 <p>Input your headphone's sensitivity (either dB/mW or dB/V), impedance, and your amplifier's SnR and Reference level.</p>
 <label for="ohm">Headphone Impedance in Ohm</label>
-<input type="number" id="headphoneimpedance" name="ohm" onchange="sensCalc(); SnrCalc()" onblur="mirror(this)"><br>
+<input type="number" id="headphoneimpedance" name="ohm" onchange="update(this);"><br>
 <label for="mw">Headphone Sensitivity in dBSPL/mW</label>
-<input type="number" id="headphonesensitivitymw" name="mw" onchange="sensCalc(); SnrCalc()" onblur="mirror(this)"><br>
+<input type="number" id="headphonesensitivitymw" name="mw" onchange="update(this);"><br>
 <label for="vrms">Headphone Sensitity in dBSPL/V</label>
-<input type="number" id="headphonesensitivityv" name="vrms" onchange="sensCalc(); SnrCalc()" onblur="mirror(this)"><br>
+<input type="number" id="headphonesensitivityv" name="vrms" onchange="update(this);"><br>
 <label for="snr">Amplifier Signal to Noise Ratio</label>
-<input type="number" id="amplifiersnr" name="snr" onchange="SnrCalc()"><br>
+<input type="number" id="amplifiersnr" name="snr" onchange="update(this);"><br>
 <label for="rf">Reference Level / Vrms</label>
-<input type="number" id="referencelvl" name="rf" onchange="SnrCalc()"><br>
+<input type="number" id="referencelvl" name="rf" onchange="update(this);"><br>
 <p id="noiseoutput"></p>
 
 <h3>Maximum Output Calculator</h3>
 <p>Input your headphone's sensitivity (either dB/mW or dB/V), impedance, and your amplifiers output into a reference impedance.</p>
 <label for="ohm">Headphone Impedance in Ohm</label>
-<input type="number" id="headphoneimpedance" name="ohm" onchange="outputCalc(); sensCalc()" onblur="mirror(this); sensCalc()"><br>
+<input type="number" id="headphoneimpedance" name="ohm" onchange="update(this);"><br>
 <label for="mw">Headphone Sensitivity in dBSPL/mW</label>
-<input type="number" id="headphonesensitivitymw" name="mw" onchange="outputCalc(); sensCalc()" onblur="mirror(this); sensCalc()"><br>
+<input type="number" id="headphonesensitivitymw" name="mw" onchange="update(this);"><br>
 <label for="vrms">Headphone Sensitivity in dBSPL/V</label>
-<input type="number" id="headphonesensitivityv" name="vrms" onchange="outputCalc(); sensCalc()" onblur="mirror(this); sensCalc()"><br>
+<input type="number" id="headphonesensitivityv" name="vrms" onchange="update(this);"><br>
 <label for="ampw">Amplifier Power Rating in mW</label>
-<input type="number" id="amplifieroutput" name="ampmw" onchange="outputCalc()"><br>
+<input type="number" id="amplifieroutput" name="ampmw" onchange="update(this);"><br>
 <label for="refimp">Reference Impedance in Ohm</label>
-<input type="number" id="referenceimpedance" name="refimp" onchange="outputCalc()"><br>
+<input type="number" id="referenceimpedance" name="refimp" onchange="update(this);"><br>
 <label for="crs">Crest Factor in dBSPL</label>
-<input type="number" id="crestfactor" name="crs" onchange="outputCalc()"><br>
+<input type="number" id="crestfactor" name="crs" onchange="update(this);"><br>
 <p id="outputcalcoutput"></p>
 
 <!--<h3>Recommended Amplifier Power Calculator</h3>
@@ -73,22 +73,27 @@ var impHistory = [];
 //called the function easily.
 
 //MIRROR FUNCTION
+function update(source) {
+  mirror(source);
+  sensCalc();
+  outputCalc();
+}
 
-function mirror(field) {
+function mirror(source) {
   
   console.log("mirror function fired!");
 
   //Check what element called the function and push their value to the appropriate array
 
-  switch(field.name) {
+  switch(source.name) {
     case "mw":
-    mwHistory.push(field.value); 
+    mwHistory.push(source.value); 
     break;
     case "vrms":
-    vHistory.push(field.value);
+    vHistory.push(source.value);
     break;
     case "ohm": 
-    impHistory.push(field.value);
+    impHistory.push(source.value);
     console.log("impedance pushed to array!")
     break;
   }
@@ -96,8 +101,8 @@ function mirror(field) {
   //Cycle through objects with the same name, and push the latest relevant value to their
   //input fields
 
-  document.querySelectorAll("input[name=" + field.name + "]").forEach(element => {
-    switch(field.name) {
+  document.querySelectorAll("input[name=" + source.name + "]").forEach(element => {
+    switch(source.name) {
     case "mw":
     var latestValue = mwHistory[(mwHistory.length - 1)];
     element.value = latestValue;
@@ -236,8 +241,8 @@ function outputCalc() {
 
     } else if (referenceImpedance > headphoneImpedance) {
 
-      var amplifierVoltage = Math.sqrt(amplifierPower * referenceImpedance);
       var amplifierCurrent = Math.sqrt(amplifierPower / referenceImpedance);
+      var amplifierVoltage = Math.sqrt(amplifierCurrent * headphoneImpedance);
       
       var sqrtAv = Math.sqrt(amplifierVoltage);
       var logSqrtAv = 20 * Math.log10(sqrtAv);
