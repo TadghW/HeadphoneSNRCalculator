@@ -19,11 +19,11 @@
 <h3>Maximum Output Calculator</h3>
 <p>Input your headphone's sensitivity (either dB/mW or dB/V), impedance, and your amplifiers output into a reference impedance.</p>
 <label for="ohm">Headphone Impedance in Ohm</label>
-<input type="number" id="headphoneimpedance" name="ohm" onchange="outputCalc(); sensCalc()" onblur="mirror(this)"><br>
+<input type="number" id="headphoneimpedance" name="ohm" onchange="outputCalc(); sensCalc()" onblur="mirror(this); sensCalc()"><br>
 <label for="mw">Headphone Sensitivity in mW</label>
-<input type="number" id="headphonesensitivitymw" name="mw" onchange="outputCalc(); sensCalc()" onblur="mirror(this)"><br>
+<input type="number" id="headphonesensitivitymw" name="mw" onchange="outputCalc(); sensCalc()" onblur="mirror(this); sensCalc()"><br>
 <label for="vrms">Headphone Sensitivity in V</label>
-<input type="number" id="headphonesensitivityv" name="vrms" onchange="outputCalc(); sensCalc()" onblur="mirror(this)"><br>
+<input type="number" id="headphonesensitivityv" name="vrms" onchange="outputCalc(); sensCalc()" onblur="mirror(this); sensCalc()"><br>
 <label for="ampw">Amplifier Power Rating in mW</label>
 <input type="number" id="amplifieroutput" name="ampmw" onchange="outputCalc()"><br>
 <label for="refimp">Reference Impedance in Ohm</label>
@@ -176,7 +176,7 @@ function calculateVoltageSensitivity() {
   function calculateMilliwattSensitivity() {
   
     //Same shtick here
-    var impedance = document.getElementById("impedance").value;
+    var impedance = document.getElementById("headphoneimpedance").value;
     var milliwattSensitivity = document.getElementById("headphonesensitivitymw").value;
     var voltageSensitivity = document.getElementById("headphonesensitivityv").value;
     var calculatedMilliwattSensitivity = (voltageSensitivity -(10 * Math.log10((1/impedance)*1000)));
