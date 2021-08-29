@@ -216,7 +216,7 @@ function outputCalc() {
   var voltageSensitivity = parseFloat(document.getElementById("headphonesensitivityv").value);
   var amplifierPower = document.getElementById("amplifieroutput").value;
   var referenceImpedance = document.getElementById("referenceimpedance").value;
-  var crestFactor = document.getElementById("crestfactor").value;
+  var crestFactor = parseFloat(document.getElementById("crestfactor").value);
   var maxOutput;
 
   if (headphoneImpedance > 0 & referenceImpedance > 0 & crestFactor > 0) {
@@ -229,7 +229,7 @@ function outputCalc() {
       var plsVs = (log20SqrtApRi + voltageSensitivity);
       var mO = plsVs - crestFactor;
       var mOR = mO.toFixed(2);
-      var mP = mOR + crestFactor; 
+      var mP = parseFloat(mOR) + parseFloat(crestFactor); 
       
       outputCalcOutput.innerHTML = "Maximum average level = " + mOR + "dBSPL" + "\n" + "Maximum peak level = " + mP + "dBSPL";
       console.log("Max output is: " + mO);
@@ -244,7 +244,7 @@ function outputCalc() {
       var plsVs = logSqrtAv + voltageSensitivity;
       var mO = plsVs - crestFactor;
       var mOR = mO.toFixed(2);
-      var mP = mOR + crestFactor;
+      var mP = parseFloat(mOR) + parseFloat(crestFactor);
       
       outputCalcOutput.innerHTML = "Maximum average level = " + mOR + "dBSPL" + "\n" + "Maximum peak level = " + mP + "dBSPL";
       console.log("Max output is: " + mOR + "dBSPL");
