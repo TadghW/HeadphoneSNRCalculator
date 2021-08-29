@@ -212,7 +212,9 @@ function snrCalc(){
     
   //Here's how we write the answer to the page - the code will calculate the correct value with
   //the formula we gave it above
-  noiseCalcOutput.innerHTML = "Total noise output = " + noiseOutputRounded + "dBSPL";
+  if(isFinite(noiseOutputRounded)) {
+    noiseCalcOutput.innerHTML = "Total noise output = " + noiseOutputRounded + "dBSPL";
+  }
 }
 
 function outputCalc() {
