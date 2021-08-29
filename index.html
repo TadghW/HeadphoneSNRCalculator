@@ -76,6 +76,7 @@ var impHistory = [];
 function update(source) {
   mirror(source);
   sensCalc();
+  snrCalc();
   outputCalc();
 }
 
@@ -197,7 +198,7 @@ function calculateVoltageSensitivity() {
 
 //MAJOR CALCULATORS
 
-function SnrCalc(){
+function snrCalc(){
 
   //By telling the code how to get do each stage of the calculation we can just call the result and
   //the code will figure it out for us
@@ -241,12 +242,11 @@ function outputCalc() {
 
     } else if (referenceImpedance > headphoneImpedance) {
 
-      var amplifierCurrent = Math.sqrt(amplifierPower / referenceImpedance);
-      var amplifierVoltage = Math.sqrt(amplifierCurrent * headphoneImpedance);
+      var amplifierCurrent = Math.sqrt((amplifierPower*.001) / referenceImpedance);
+      var amplifierVoltage = (amplifierCurrent * headphoneImpedance);
       
-      var sqrtAv = Math.sqrt(amplifierVoltage);
-      var logSqrtAv = 20 * Math.log10(sqrtAv);
-      var plsVs = logSqrtAv + voltageSensitivity;
+      var logAv = 20 * Math.log10(amplifierVoltage);
+      var plsVs = logAv + voltageSensitivity;
       var mO = plsVs - crestFactor;
       var mOR = mO.toFixed(2);
       var mP = parseFloat(mOR) + parseFloat(crestFactor);
