@@ -237,7 +237,7 @@ function outputCalc() {
       var mOR = mO.toFixed(2);
       var mP = parseFloat(mOR) + parseFloat(crestFactor); 
       
-      outputCalcOutput.innerHTML = "Maximum average level = " + mOR + "dBSPL" + "\n" + "Maximum peak level = " + mP + "dBSPL";
+      outputCalcOutput.innerHTML = "Maximum average level = " + mOR + "dBSPL" + "<br>" + "Maximum peak level = " + mP + "dBSPL";
       console.log("Max output is: " + mO);
 
     } else if (referenceImpedance > headphoneImpedance) {
@@ -251,7 +251,7 @@ function outputCalc() {
       var mOR = mO.toFixed(2);
       var mP = parseFloat(mOR) + parseFloat(crestFactor);
       
-      outputCalcOutput.innerHTML = "Maximum average level = " + mOR + "dBSPL" + "\n" + "Maximum peak level = " + mP + "dBSPL";
+      outputCalcOutput.innerHTML = "Maximum average level = " + mOR + "dBSPL" + "<br>" + "Maximum peak level = " + mP + "dBSPL";
       console.log("Max output is: " + mOR + "dBSPL");
     }
   } else {
