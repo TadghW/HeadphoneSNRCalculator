@@ -4,18 +4,45 @@
 
 <h3>Audible Noise Calculator</h3>
 <p>Input your headphone's sensitivity (either dB/mW or dB/V), impedance, and your amplifier's SnR and Reference level.</p>
-<label for="ohm">Impedance</label>
-<input type="number" id="impedance" name="ohm" onchange="sensCalc()"><br>
-<label for="mw">Sensitivity in dB/mW</label>
-<input type="number" id="milliwattsens" name="mw" onchange="sensCalc()"><br>
-<label for="vrms">Sensitity in dB/V</label>
-<input type="number" id="vrmssens" name="vrms" onchange="sensCalc()"><br>
+<label for="ohm">Headphone Impedance in Ohm</label>
+<input type="number" id="headphoneimpedance" name="ohm" onchange="sensCalc(); SnrCalc()" onblur="mirror(this)"><br>
+<label for="mw">Headphone Sensitivity in dB/mW</label>
+<input type="number" id="headphonesensitivitymw" name="mw" onchange="sensCalc(); SnrCalc()" onblur="mirror(this)"><br>
+<label for="vrms">Headphone Sensitity in dB/V</label>
+<input type="number" id="headphonesensitivityv" name="vrms" onchange="sensCalc(); SnrCalc()" onblur="mirror(this)"><br>
 <label for="snr">Amplifier Signal to Noise Ratio</label>
 <input type="number" id="amplifiersnr" name="snr" onchange="SnrCalc()"><br>
 <label for="rf">Reference Level / Vrms</label>
 <input type="number" id="referencelvl" name="rf" onchange="SnrCalc()"><br>
+<p id="noiseoutput"></p>
 
-<p id="output"></div>
+<h3>Maximum Output Calculator</h3>
+<p>Input your headphone's sensitivity (either dB/mW or dB/V), impedance, and your amplifiers output into a reference impedance.</p>
+<label for="ohm">Headphone Impedance in Ohm</label>
+<input type="number" id="headphoneimpedance" name="ohm" onchange="outputCalc(); sensCalc()" onblur="mirror(this)"><br>
+<label for="mw">Headphone Sensitivity in mW</label>
+<input type="number" id="headphonesensitivitymw" name="mw" onchange="outputCalc(); sensCalc()" onblur="mirror(this)"><br>
+<label for="vrms">Headphone Sensitivity in V</label>
+<input type="number" id="headphonesensitivityv" name="vrms" onchange="outputCalc(); sensCalc()" onblur="mirror(this)"><br>
+<label for="ampw">Amplifier Power Rating in mW</label>
+<input type="number" id="amplifieroutput" name="ampmw" onchange="outputCalc()"><br>
+<label for="refimp">Reference Impedance in Ohm</label>
+<input type="number" id="referenceimpedance" name="refimp" onchange="outputCalc()"><br>
+<label for="crs">Crest Factor in dB</label>
+<input type="number" id="crestfactor" name="crs" onchange="outputCalc()"><br>
+<p id="outputcalcoutput"></p>
+
+<!--<h3>Recommended Amplifier Power Calculator</h3>
+<p>Input your headphone's sensitivity (either dB/mW or dB/V), impedance, and your maximum desired listening volume</p>
+<label for="ohm">Headphone Impedance in Ohm</label>
+<input type="number" id="headphoneimpedance" name="ohm" onchange="powerCalc()" onblur="mirror(this)"><br>
+<label for="mw">Headphone Sensitivity in dB/mW</label>
+<input type="number" id="headphonesensitivitymw" name="mw" onchange="powerCalc()" onblur="mirror(this)"><br>
+<label for="vrms">Headphone Sensitity in dB/V</label>
+<input type="number" id="headphonesensitivityv" name="vrms" onchange="powerCalc()" onblur="mirror(this)"><br>
+<label for="volume">Max Listening Volume</label>
+<input type="number" id="listeningvolume" name="volume" onchange="powerCalc()"><br>
+<p id="powercalcoutput"></p>-->
 
 </html>
 
@@ -24,21 +51,152 @@
 
 //This is JavaScript, the logic for the page 
 
-//Here we the logic to the relevant information for easy reference, and as the objects 
-//we're reading from are static and don't change, we should define them as constants
+//At the beginning of our script we can define information that our logic might need.
 
-const impedance = document.getElementById("impedance").value;
-const output = document.getElementById("output");
+//As these definitions exist outside of a function or object, they are "global" objects
+//and can be referenced by anything.
 
-//A "function" is a package of behaviour we want this program to undertake when told to
-//In this instance you can see we're calling SnrCalc() whenever the input fields for the 
-//SNR calculator are changed.
+//"Const" objects are constant, their values do not change and cannot be written to.
+//"Var" objects are variable, and can be manipulated by the logic (or the user).
+
+const noiseCalcOutput = document.getElementById("noiseoutput");
+const outputCalcOutput = document.getElementById("outputcalcoutput");
+var mwHistory = [];
+var vHistory = [];
+var impHistory = [];
+
+//A "function" is a package of behaviour we want this program to undertake when told to.
+//In this case, we demand that an object be passed to the function before it works,
+//and in our HTML we made our input fields pass their own information into the function
+//every time one of them is called.
+//This will allow us to access both the name and the value of the particular object that
+//called the function easily.
+
+//MIRROR FUNCTION
+
+function mirror(field) {
+  
+  console.log("mirror function fired!");
+
+  //Check what element called the function and push their value to the appropriate array
+
+  switch(field.name) {
+    case "mw":
+    mwHistory.push(field.value); 
+    break;
+    case "vrms":
+    vHistory.push(field.value);
+    break;
+    case "ohm": 
+    impHistory.push(field.value);
+    console.log("impedance pushed to array!")
+    break;
+  }
+
+  //Cycle through objects with the same name, and push the latest relevant value to their
+  //input fields
+
+  document.querySelectorAll("input[name=" + field.name + "]").forEach(element => {
+    switch(field.name) {
+    case "mw":
+    var latestValue = mwHistory[(mwHistory.length - 1)];
+    element.value = latestValue;
+    console.log("latest mw value = " + latestValue);
+    break;
+    case "vrms":
+    var latestValue = vHistory[(vHistory.length - 1)];
+    element.value = latestValue;
+    console.log("latest vrms value = " + latestValue);
+    break;
+    case "ohm":
+    var latestValue = impHistory[(impHistory.length - 1)];
+    element.value = latestValue;
+    console.log("latest imp value = " + latestValue);
+    break;
+    }
+    });
+}
+
+
+//AUTOMATIC SENSITIVITY CONVERTER
+
+function sensCalc() {
+
+//These variables are locally scoped, so they only exist within the context of this function
+//by scoping the same information locally inside each of our functions we can stop them
+//interfering with one another.
+
+var impedance = document.getElementById("headphoneimpedance").value;
+var milliwattSensitivity = document.getElementById("headphonesensitivitymw").value;
+var voltageSensitivity = document.getElementById("headphonesensitivityv").value;
+
+//This part chooses which calculation to do based on what the user has input:
+//If all three fields are populated do nothing
+//If everything but dB/V is populated calculate dB/V
+//If everything but dB/mW is populated calculate dB/mW
+//If only one field is populated do nothing
+
+ if (impedance.length > 0 && milliwattSensitivity.length > 0 && voltageSensitivity.length > 0) { 
+ } else if (impedance.length > 0 && milliwattSensitivity.length > 0) {
+  calculateVoltageSensitivity();
+  console.log("dB/V calculated")
+ } else if (impedance.length > 0 && voltageSensitivity.length > 0) {
+  calculateMilliwattSensitivity();
+  console.log("dB/mW calculated");
+ } else {
+   console.log("insufficient data for automatic sensitivity calculation, waiting for additional input..");
+  }
+
+ }
+
+function calculateVoltageSensitivity() {
+    
+    //Variables in front define relevant information to the calculation
+    //Calculation is made with existing information and rounded to two places, before being ouput
+    //Output populates the appropriate input field
+  
+    var milliwattSensitivity = document.getElementById("headphonesensitivitymw").value;
+    var voltageSensitivity = document.getElementById("headphonesensitivityv").value;
+    var impedance = document.getElementById("headphoneimpedance").value;
+    
+    var calculatedVoltageSensitivity = milliwattSensitivity - (Math.log10(Math.sqrt(impedance * 0.001)) * 20);
+    var roundedVoltageSensitivity = calculatedVoltageSensitivity.toFixed(2);
+  
+    //For some reason assigning the new value directly to the voltageSensitivity variable wasn't working,
+    //solved by selecting the input field with querySelector instead of id, here's one of the reasons 
+    //here's one of the scenarios where assigning a name as well as an id makes sense :) although I 
+    //honestly can't think of others...
+      
+    document.querySelectorAll('input[name="vrms"]').forEach(element => {
+    element.value = roundedVoltageSensitivity;
+    });
+      return roundedVoltageSensitivity;
+  }
+  
+  function calculateMilliwattSensitivity() {
+  
+    //Same shtick here
+    var impedance = document.getElementById("impedance").value;
+    var milliwattSensitivity = document.getElementById("headphonesensitivitymw").value;
+    var voltageSensitivity = document.getElementById("headphonesensitivityv").value;
+    var calculatedMilliwattSensitivity = (voltageSensitivity -(10 * Math.log10((1/impedance)*1000)));
+    var roundedMilliwattSensitivity = calculatedMilliwattSensitivity.toFixed(2);
+  
+    document.querySelector('input[name="mw"]').value = roundedMilliwattSensitivity;
+    document.querySelectorAll('input[name="mw"]').forEach(element => {
+    element.value = roundedMilliwattSensitivity;
+    });
+    return roundedMilliwattSensitivity;
+  }
+
+
+//MAJOR CALCULATORS
 
 function SnrCalc(){
 
   //By telling the code how to get do each stage of the calculation we can just call the result and
   //the code will figure it out for us
-  var headphoneSensitivity = document.getElementById("vrmssens").value;
+  var headphoneSensitivity = document.getElementById("headphonesensitivityv").value;
   var amplifierSnr = document.getElementById("amplifiersnr").value;
   var referenceLevel = document.getElementById("referencelvl").value;
   var logOfReferenceLevel = Math.log10(referenceLevel) * 20;
@@ -48,76 +206,50 @@ function SnrCalc(){
     
   //Here's how we write the answer to the page - the code will calculate the correct value with
   //the formula we gave it above
-  output.innerHTML = "Total noise output = " + noiseOutputRounded + "dB";
-  console.log(amplifierSnr + referenceLevel);
+  noiseCalcOutput.innerHTML = "Total noise output = " + noiseOutputRounded + "dB";
 }
 
-function sensCalc() {
+function outputCalc() {
 
-  //Secondary calculator (headphone sensitivity and impedance calc)
-  
-  //As each 2/3 of our functions for the Sensitivity Calculator actually output stuff to the inputs
-  //the value of said inputs is no longer constant, so we need to use locally scoped variables that
-  //we can change as we see fit
+  var headphoneImpedance = document.getElementById("headphoneimpedance").value;
+  var milliwattSensitivity = document.getElementById("headphonesensitivitymw").value;
+  var voltageSensitivity = parseFloat(document.getElementById("headphonesensitivityv").value);
+  var amplifierPower = document.getElementById("amplifieroutput").value;
+  var referenceImpedance = document.getElementById("referenceimpedance").value;
+  var crestFactor = document.getElementById("crestfactor").value;
+  var maxOutput;
 
-  var impedance = document.getElementById("impedance").value;
-  var milliwattSensitivity = document.getElementById("milliwattsens").value;
-  var voltageSensitivity = document.getElementById("vrmssens").value;
+  if (headphoneImpedance > 0 & referenceImpedance > 0 & crestFactor > 0) {
+    
+    if (referenceImpedance <= headphoneImpedance) {
+      
+      var sqrtApRi = Math.sqrt(amplifierPower * referenceImpedance);
+      var log20SqrtApRi = (Math.log10(sqrtApRi) * 20);
+      var plsVs = (log20SqrtApRi + voltageSensitivity);
+      var mO = plsVs - crestFactor;
+      var mOR = mO.toFixed(2); 
+      
+      outputCalcOutput.innerHTML = "Maximum output = " + mOR + "dB";
+      console.log("Max output is: " + mO);
 
-  //This part chooses which calculation to do based on what the user has input:
-  //If all three fields are populated do nothing
-  //If everything but dB/V is populated calculate dB/V
-  //If everything but dB/mW is populated calculate dB/mW
-  //If only one field is populated do nothing
+    } else if (referenceImpedance > headphoneImpedance) {
 
-   if (impedance.length > 0 && milliwattSensitivity.length > 0 && voltageSensitivity.length > 0) { 
-    console.log("all fields populated! no calculation required");
-   } else if (impedance.length > 0 && milliwattSensitivity.length > 0) {
-    console.log("everything but Vrms sensitivity filled, calculating V/dB...");
-    calculateVoltageSensitivity();
-   } else if (impedance.length > 0 && voltageSensitivity.length > 0) {
-    console.log("everything but mW sensitivity filled, calculating Mw/dB...");
-    calculateMilliwattSensitivity();
-   } else {
-     console.log("insufficient data for calculation, waiting for input..");
+      var amplifierVoltage = Math.sqrt(amplifierPower * referenceImpedance);
+      var amplifierCurrent = Math.sqrt(amplifierPower / referenceImpedance);
+      
+      var sqrtAv = Math.sqrt(amplifierVoltage);
+      var logSqrtAv = 20 * Math.log10(sqrtAv);
+      var plsVs = logSqrtAv + voltageSensitivity;
+      var mO = plsVs - crestFactor;
+      var mOR = mO.toFixed(2);
+      
+      outputCalcOutput.innerHTML = "Maximum output = " + mOR + "dB";
+      console.log("Max output is: " + mOR + "dB");
     }
+  } else {
+    console.log("insufficient data for maximum output calculation, waiting for additional input...")
+  }
 
-   }
-
-function calculateVoltageSensitivity() {
-    
-  //Variables in front define relevant information to the calculation
-  //Calculation is made with existing information and rounded to two places, before being ouput
-  //Output populates the appropriate input field
-
-  var impedance = document.getElementById("impedance").value;
-  var milliwattSensitivity = document.getElementById("milliwattsens").value;
-  var voltageSensitivity = document.getElementById("vrmssens").value;
-  
-  var calculatedVoltageSensitivity = milliwattSensitivity - (Math.log10(Math.sqrt(impedance * 0.001)) * 20);
-  var roundedVoltageSensitivity = calculatedVoltageSensitivity.toFixed(2);
-
-  //For some reason assigning the new value directly to the voltageSensitivity variable wasn't working,
-  //solved by selecting the input field with querySelector instead of id, here's one of the reasons 
-  //here's one of the scenarios where assigning a name as well as an id makes sense :) although I 
-  //honestly can't think of others...
-    
-    document.querySelector('input[name="vrms"]').value = roundedVoltageSensitivity;
-    return roundedVoltageSensitivity;
 }
-
-function calculateMilliwattSensitivity() {
-
-  //Same shtick here
-  var impedance = document.getElementById("impedance").value;
-  var milliwattSensitivity = document.getElementById("milliwattsens").value;
-  var voltageSensitivity = document.getElementById("vrmssens").value;
-  var calculatedMilliwattSensitivity = (voltageSensitivity -(10 * Math.log10((1/impedance)*1000)));
-  var roundedMilliwattSensitivity = calculatedMilliwattSensitivity.toFixed(2);
-
-  document.querySelector('input[name="mw"]').value = roundedMilliwattSensitivity;
-  return roundedMilliwattSensitivity;
-}
-
 </script>
 
