@@ -229,9 +229,9 @@ function outputCalc() {
       var plsVs = (log20SqrtApRi + voltageSensitivity);
       var mO = plsVs - crestFactor;
       var mOR = mO.toFixed(2);
-      var MP = mOR + crestFactor; 
+      var mP = mOR + crestFactor; 
       
-      outputCalcOutput.innerHTML = "Maximum output = " + mOR + "dBSPL" + "\n" + "Maximum peak level = " + mP + "dBSPL";
+      outputCalcOutput.innerHTML = "Maximum average level = " + mOR + "dBSPL" + "\n" + "Maximum peak level = " + mP + "dBSPL";
       console.log("Max output is: " + mO);
 
     } else if (referenceImpedance > headphoneImpedance) {
