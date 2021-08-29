@@ -6,9 +6,9 @@
 <p>Input your headphone's sensitivity (either dB/mW or dB/V), impedance, and your amplifier's SnR and Reference level.</p>
 <label for="ohm">Headphone Impedance in Ohm</label>
 <input type="number" id="headphoneimpedance" name="ohm" onchange="sensCalc(); SnrCalc()" onblur="mirror(this)"><br>
-<label for="mw">Headphone Sensitivity in dB/mW</label>
+<label for="mw">Headphone Sensitivity in dBSPL/mW</label>
 <input type="number" id="headphonesensitivitymw" name="mw" onchange="sensCalc(); SnrCalc()" onblur="mirror(this)"><br>
-<label for="vrms">Headphone Sensitity in dB/V</label>
+<label for="vrms">Headphone Sensitity in dBSPL/V</label>
 <input type="number" id="headphonesensitivityv" name="vrms" onchange="sensCalc(); SnrCalc()" onblur="mirror(this)"><br>
 <label for="snr">Amplifier Signal to Noise Ratio</label>
 <input type="number" id="amplifiersnr" name="snr" onchange="SnrCalc()"><br>
@@ -20,15 +20,15 @@
 <p>Input your headphone's sensitivity (either dB/mW or dB/V), impedance, and your amplifiers output into a reference impedance.</p>
 <label for="ohm">Headphone Impedance in Ohm</label>
 <input type="number" id="headphoneimpedance" name="ohm" onchange="outputCalc(); sensCalc()" onblur="mirror(this); sensCalc()"><br>
-<label for="mw">Headphone Sensitivity in mW</label>
+<label for="mw">Headphone Sensitivity in dBSPL/mW</label>
 <input type="number" id="headphonesensitivitymw" name="mw" onchange="outputCalc(); sensCalc()" onblur="mirror(this); sensCalc()"><br>
-<label for="vrms">Headphone Sensitivity in V</label>
+<label for="vrms">Headphone Sensitivity in dBSPLV</label>
 <input type="number" id="headphonesensitivityv" name="vrms" onchange="outputCalc(); sensCalc()" onblur="mirror(this); sensCalc()"><br>
 <label for="ampw">Amplifier Power Rating in mW</label>
 <input type="number" id="amplifieroutput" name="ampmw" onchange="outputCalc()"><br>
 <label for="refimp">Reference Impedance in Ohm</label>
 <input type="number" id="referenceimpedance" name="refimp" onchange="outputCalc()"><br>
-<label for="crs">Crest Factor in dB</label>
+<label for="crs">Crest Factor in dBSPL</label>
 <input type="number" id="crestfactor" name="crs" onchange="outputCalc()"><br>
 <p id="outputcalcoutput"></p>
 
@@ -206,7 +206,7 @@ function SnrCalc(){
     
   //Here's how we write the answer to the page - the code will calculate the correct value with
   //the formula we gave it above
-  noiseCalcOutput.innerHTML = "Total noise output = " + noiseOutputRounded + "dB";
+  noiseCalcOutput.innerHTML = "Total noise output = " + noiseOutputRounded + "dBSPL";
 }
 
 function outputCalc() {
@@ -223,13 +223,15 @@ function outputCalc() {
     
     if (referenceImpedance <= headphoneImpedance) {
       
-      var sqrtApRi = Math.sqrt(amplifierPower * referenceImpedance);
+      var ampPowerW = amplifierPower * .001;
+      var sqrtApRi = Math.sqrt(ampPowerW * referenceImpedance);
       var log20SqrtApRi = (Math.log10(sqrtApRi) * 20);
       var plsVs = (log20SqrtApRi + voltageSensitivity);
       var mO = plsVs - crestFactor;
-      var mOR = mO.toFixed(2); 
+      var mOR = mO.toFixed(2);
+      var MP = mOR + crestFactor; 
       
-      outputCalcOutput.innerHTML = "Maximum output = " + mOR + "dB";
+      outputCalcOutput.innerHTML = "Maximum output = " + mOR + "dBSPL" + "\n" + "Maximum peak level = " + mP + "dBSPL";
       console.log("Max output is: " + mO);
 
     } else if (referenceImpedance > headphoneImpedance) {
@@ -242,9 +244,10 @@ function outputCalc() {
       var plsVs = logSqrtAv + voltageSensitivity;
       var mO = plsVs - crestFactor;
       var mOR = mO.toFixed(2);
+      var mP = mOR + crestFactor;
       
-      outputCalcOutput.innerHTML = "Maximum output = " + mOR + "dB";
-      console.log("Max output is: " + mOR + "dB");
+      outputCalcOutput.innerHTML = "Maximum average level = " + mOR + "dBSPL" + "\n" + "Maximum peak level = " + mP + "dBSPL";
+      console.log("Max output is: " + mOR + "dBSPL");
     }
   } else {
     console.log("insufficient data for maximum output calculation, waiting for additional input...")
