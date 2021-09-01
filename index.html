@@ -274,19 +274,19 @@ function outputCalc() {
 
   function zImpactCalc() {
 
-    var minHeadphoneImpedance = document.getElementById("minimumheadphoneimpedance").value;
-    var maxHeadphoneImpedance = document.getElementById("maximumheadphoneimpedance").value;
-    var amplifierZOut = document.getElementById("amplifieroutputimpedance").value;
+    var minHeadphoneImpedance = parseFloat(document.getElementById("minimumheadphoneimpedance").value);
+    var maxHeadphoneImpedance = parseFloat(document.getElementById("maximumheadphoneimpedance").value);
+    var amplifierZOut = parseFloat(document.getElementById("amplifieroutputimpedance").value);
     var output = document.getElementById("frequencyresponseimpact");
 
     //Voltage out into minimum headphone impedance, turn that into dB 
 
-    minVOut = 1 * minHeadphoneImpedance/(minHeadphoneImpedance + amplifierZOut);
+    minVOut = minHeadphoneImpedance / (minHeadphoneImpedance + amplifierZOut);
     minImpFrImpact = 20 * (Math.log10(minVOut));
 
     //Voltage out into maximum headphone impedance, turn that into dB
 
-    maxVOut = 1 * maxHeadphoneImpedance/(maxHeadphoneImpedance + amplifierZOut);
+    maxVOut = maxHeadphoneImpedance / (maxHeadphoneImpedance + amplifierZOut);
     maxImpFrImpact = 20 * (Math.log10(maxVOut));
 
 
