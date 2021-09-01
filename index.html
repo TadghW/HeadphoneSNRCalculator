@@ -3,7 +3,7 @@
 <!--This is HTML, markup telling the browser what to display on a client's browser-->
 
 <h3>Audible Noise Calculator</h3>
-<p>Input your headphone's sensitivity (either dB/mW or dB/V), impedance, and your amplifier's SnR and Reference level.</p>
+<p>Input your headphone's sensitivity (either dBSPL/mW or dBSPL/V), nominal impedance, and your amplifier's Signal-to-Noise Ratio (SNR) and the voltage used for the SNR measurement.</p>
 <label for="ohm">Headphone Impedance in Ohm</label>
 <input type="number" id="headphoneimpedance" name="ohm" onchange="update(this);"><br>
 <label for="mw">Headphone Sensitivity in dBSPL/mW</label>
@@ -17,7 +17,7 @@
 <p id="noiseoutput"></p>
 
 <h3>Maximum Output Calculator</h3>
-<p>Input your headphone's sensitivity (either dB/mW or dB/V), impedance, and your amplifiers output into a reference impedance.</p>
+<p>Input your headphone's sensitivity (either dBSPL/mW or dBSPL/V), nominal impedance, and your amplifier's output power at the closest specified impedance (e.g. 32 ohm for a 22 ohm headphone, 300 ohm for a 250 ohm headphone).</p>
 <label for="ohm">Headphone Impedance in Ohm</label>
 <input type="number" id="headphoneimpedance" name="ohm" onchange="update(this);"><br>
 <label for="mw">Headphone Sensitivity in dBSPL/mW</label>
@@ -28,12 +28,12 @@
 <input type="number" id="amplifieroutput" name="ampmw" onchange="update(this);"><br>
 <label for="refimp">Reference Impedance in Ohm</label>
 <input type="number" id="referenceimpedance" name="refimp" onchange="update(this);"><br>
-<label for="crs">Crest Factor in dBSPL</label>
+<label for="crs">Crest Factor in dBSPL (typically 10-20)</label>
 <input type="number" id="crestfactor" name="crs" onchange="update(this);"><br>
 <p id="outputcalcoutput"></p>
 
 <h3>Impact of Amplifier Output Impedance</h3>
-<p>Input your headphones minimum and maximum load impedance (you'll need to chek measurement graphs for these) and your amplifier's output impedance</p>
+<p>Input your headphones' highest impedance from an impedance vs. frequency graph, the lowest impedance from the graph, and your amplifier's output impedance</p>
 <label for="minohm">Minimum Headphone Impedance in Ohm</label>
 <input type="number" id="minimumheadphoneimpedance" name="minohm" onchange="update(this);"><br>
 <label for="maxohm">Maxmimum Headphone Impedance in Ohm</label>
@@ -292,10 +292,12 @@ function outputCalc() {
 
     var frImpact = maxImpFrImpact - minImpFrImpact;
     var frImpactRounded = frImpact.toFixed(2);
+	
+	var sensImpactRounded = minImpFrImpact.toFixed(2)
 
-    //Calculate FR distortion between two points, wrapped in isFinite to stop function from outputing NaN, infinity, -infinity, etc.
+    //Calculate relative FR change between two points, wrapped in isFinite to stop function from outputing NaN, infinity, -infinity, etc.
     if(isFinite(frImpact)){
-      output.innerHTML = "Frequency response distortion caused by amplifier output impedance vs headphone imedpance = " + frImpactRounded + "dBSPL";
+      output.innerHTML = "Worst-case change in relative frequency response from output impedance: " + frImpactRounded + "dB" + "<br>" + "Sensitivity loss from output impedance voltage drop: " + sensImpactRounded + "dB";
       } else {
       console.log("insufficient data for impact of Z calculation");
     }
