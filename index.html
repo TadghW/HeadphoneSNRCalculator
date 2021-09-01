@@ -277,11 +277,7 @@ function outputCalc() {
     var minHeadphoneImpedance = document.getElementById("minimumheadphoneimpedance").value;
     var maxHeadphoneImpedance = document.getElementById("maximumheadphoneimpedance").value;
     var amplifierZOut = document.getElementById("amplifieroutputimpedance").value;
-    
     var output = document.getElementById("frequencyresponseimpact");
-
-    //wait until ZOut input is filled to avoid outputting meaningless results
-    if (amplifierZOut) {
 
     //Voltage out into minimum headphone impedance, turn that into dB 
 
@@ -300,11 +296,10 @@ function outputCalc() {
     //Calculate FR distortion between two points, wrapped in isFinite to stop function from outputing NaN, infinity, -infinity, etc.
     if(isFinite(frImpact)){
       output.innerHTML = "Frequency response distortion caused by amplifier output impedance vs headphone imedpance = " + frImpactRounded + "dBSPL";
-      }
-    } else {
+      } else {
       console.log("insufficient data for impact of Z calculation");
     }
-    
+  
     }
 </script>
 
