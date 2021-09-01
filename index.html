@@ -32,6 +32,20 @@
 <input type="number" id="crestfactor" name="crs" onchange="update(this);"><br>
 <p id="outputcalcoutput"></p>
 
+<h3>Impact of Amplifier Output Impedance</h3>
+<p>Input your headphones minimum and maximum load impedance (you'll need to chek measurement graphs for these) and your amplifier's output impedance</p>
+<label for="minohm">Minimum Headphone Impedance in Ohm</label>
+<input type="number" id="minimumheadphoneimpedance" name="minohm" onchange="update(this);"><br>
+<label for="maxohm">Maxmimum Headphone Impedance in Ohm</label>
+<input type="number" id="maximumheadphoneimpedance" name="maxohm" onchange="update(this);"><br>
+<label for="ampw">Amplifier Power Rating in mW</label>
+<input type="number" id="amplifieroutput" name="ampmw" onchange="update(this);"><br>
+<label for="refimp">Reference Impedance in Ohm</label>
+<input type="number" id="referenceimpedance" name="refimp" onchange="update(this);"><br>
+<label for="ampohm">Amplifier Output Impedance</label>
+<input type="number" id="amplifieroutputimpedance" name="ampohm" onchange="update(this);"><br>
+<p id="frequencyresponseimpact"></p>
+
 <!--<h3>Recommended Amplifier Power Calculator</h3>
 <p>Input your headphone's sensitivity (either dB/mW or dB/V), impedance, and your maximum desired listening volume</p>
 <label for="ohm">Headphone Impedance in Ohm</label>
@@ -64,6 +78,8 @@ const outputCalcOutput = document.getElementById("outputcalcoutput");
 var mwHistory = [];
 var vHistory = [];
 var impHistory = [];
+var ampWHistory = [];
+var refImpHistory = [];
 
 //A "function" is a package of behaviour we want this program to undertake when told to.
 //In this case, we demand that an object be passed to the function before it works,
@@ -78,11 +94,10 @@ function update(source) {
   sensCalc();
   snrCalc();
   outputCalc();
+  zImpactCalc();
 }
 
 function mirror(source) {
-  
-  console.log("mirror function fired!");
 
   //Check what element called the function and push their value to the appropriate array
 
@@ -95,8 +110,14 @@ function mirror(source) {
     break;
     case "ohm": 
     impHistory.push(source.value);
-    console.log("impedance pushed to array!")
     break;
+    case "ampmw": 
+    ampWHistory.push(source.value);
+    break;
+    case "refimp":
+    refImpHistory.push(source.value);
+    break;
+
   }
 
   //Cycle through objects with the same name, and push the latest relevant value to their
@@ -118,6 +139,14 @@ function mirror(source) {
     var latestValue = impHistory[(impHistory.length - 1)];
     element.value = latestValue;
     console.log("latest imp value = " + latestValue);
+    break;
+    case "ampmw":
+    var latestValue = ampWHistory[(ampWHistory.length - 1)];
+    element.value = latestValue;
+    break;
+    case "refimp": 
+    var latestValue = refImpHistory[(refImpHistory.length - 1)];
+    element.value = latestValue;
     break;
     }
     });
@@ -259,7 +288,42 @@ function outputCalc() {
   } else {
     console.log("insufficient data for maximum output calculation, waiting for additional input...")
   }
-
 }
+
+  function zImpactCalc() {
+    var amplifierPower = document.getElementById("amplifieroutput").value;
+    var referenceImpedance = document.getElementById("referenceimpedance").value;
+    var amplifierCurrent = Math.sqrt((amplifierPower*.001) / referenceImpedance);
+    var minHeadphoneImpedance = document.getElementById("minimumheadphoneimpedance").value;
+    var maxHeadphoneImpedance = document.getElementById("maximumheadphoneimpedance").value;
+    var amplifierVoltageMin = (amplifierCurrent * minHeadphoneImpedance);
+    var amplifierVoltageMax = (amplifierCurrent * maxHeadphoneImpedance);
+    var amplifierZOut = document.getElementById("amplifieroutputimpedance").value;
+    
+    var output = document.getElementById("frequencyresponseimpact");
+
+    //wait until ZOut input is filled to avoid outputting meaningless results
+    if (amplifierZOut) {
+
+    //Voltage out into minimum headphone impedance, turn that into dB 
+
+    minVOut = amplifierVoltageMin * (minHeadphoneImpedance/(minHeadphoneImpedance + amplifierZOut));
+    minImpFrImpact = 20 * (Math.log10(minVOut));
+
+    //Voltage out into maximum headphone impedance, turn that into dB
+
+    maxVOut = amplifierVoltageMax * (maxHeadphoneImpedance/(maxHeadphoneImpedance + amplifierZOut));
+    maxImpFrImpact = 20 * (Math.log10(maxVOut));
+    var frImpact = maxImpFrImpact - minImpFrImpact;
+    var frImpactRounded = frImpact.toFixed(2);
+    //Calculate FR distortion between two points
+    if(isFinite(frImpact)){
+      output.innerHTML = "Frequency response distortion caused by amplifier output impedance vs headphone imedpance = " + frImpactRounded + "dBSPL";
+      }
+    } else {
+      console.log("insufficient data for impact of Z calculation");
+    }
+    
+    }
 </script>
 
